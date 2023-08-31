@@ -1,5 +1,17 @@
 use super::*;
 
+/*
+Citation:
+@misc{you2020large,
+      title={Large Batch Optimization for Deep Learning: Training BERT in 76 minutes},
+      author={Yang You and Jing Li and Sashank Reddi and Jonathan Hseu and Sanjiv Kumar and Srinadh Bhojanapalli and Xiaodan Song and James Demmel and Kurt Keutzer and Cho-Jui Hsieh},
+      year={2020},
+      eprint={1904.00962},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
+}
+*/
+
 #[derive(Clone, Debug)]
 pub struct ParamsLamb {
     pub lr: f64,
