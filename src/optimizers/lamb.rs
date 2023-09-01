@@ -49,38 +49,33 @@ pub struct Lamb {
 
 impl Lamb {
     pub fn new(vars: Vec<Var>, params: ParamsLamb) -> Result<Self> {
-        let vars = vars.into_iter().map(|var| {
-            let first_moment = Var::zeros(
-                var.shape(),
-                var.dtype(),
-                var.device()
-            )?;
-            let second_moment = Var::zeros(
-                var.shape(),
-                var.dtype(),
-                var.device()
-            )?;
-            Ok(VarLamb {
-                var,
-                first_moment,
-                second_moment
+        let vars = vars
+            .into_iter()
+            .map(|var| {
+                let first_moment = Var::zeros(var.shape(), var.dtype(), var.device())?;
+                let second_moment = Var::zeros(var.shape(), var.dtype(), var.device())?;
+                Ok(VarLamb {
+                    var,
+                    first_moment,
+                    second_moment,
+                })
             })
-        }).collect::<Result<Vec<_>>>()?;
+            .collect::<Result<Vec<_>>>()?;
 
         Ok(Self {
             vars,
             params,
-            step_t: 0
+            step_t: 0,
         })
     }
 
-	pub fn new_lr(vars: Vec<Var>, lr: f64) -> Result<Self> {
-		let params = ParamsLamb {
-			lr,
-			..Default::default()
-		};
-		Self::new(vars, params)
-	}
+    pub fn new_lr(vars: Vec<Var>, lr: f64) -> Result<Self> {
+        let params = ParamsLamb {
+            lr,
+            ..Default::default()
+        };
+        Self::new(vars, params)
+    }
 
     fn step(&mut self, grads: &GradStore) -> Result<()> {
         self.step_t += 1;
@@ -126,15 +121,15 @@ impl Lamb {
 }
 
 impl Optimizer for Lamb {
-	fn backward_step(&mut self, loss: &Tensor) -> Result<()> {
-		self.step(&loss.backward()?)
-	}
+    fn backward_step(&mut self, loss: &Tensor) -> Result<()> {
+        self.step(&loss.backward()?)
+    }
 
     fn get_lr(&self) -> f64 {
         self.params.lr
     }
 
-	fn set_lr(&mut self, lr: f64) {
-		self.params.lr = lr;
-	}
+    fn set_lr(&mut self, lr: f64) {
+        self.params.lr = lr;
+    }
 }

@@ -111,15 +111,15 @@ impl AdamW {
 }
 
 impl Optimizer for AdamW {
-	fn backward_step(&mut self, loss: &Tensor) -> Result<()> {
-		self.step(&loss.backward()?)
-	}
+    fn backward_step(&mut self, loss: &Tensor) -> Result<()> {
+        self.step(&loss.backward()?)
+    }
 
     fn get_lr(&self) -> f64 {
         self.params.lr
     }
 
-	fn set_lr(&mut self, lr: f64) {
-		self.params.lr = lr;
-	}
+    fn set_lr(&mut self, lr: f64) {
+        self.params.lr = lr;
+    }
 }

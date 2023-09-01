@@ -1,8 +1,8 @@
-use color_eyre::Result;
-use candle_core::{Device, DType, Module, Tensor};
-use candle_nn::{Linear, linear, VarBuilder, VarMap};
+use candle_core::{DType, Device, Module, Tensor};
+use candle_nn::{linear, Linear, VarBuilder, VarMap};
 use candle_optim::optimizers::{Lamb, Optimizer, ParamsLamb};
 use candle_optim::schedulers::{ConstantWithWarmup, Scheduler};
+use color_eyre::Result;
 
 fn gen_data() -> Result<(Tensor, Tensor)> {
     let w_gen = Tensor::new(&[[3f32, 1.]], &Device::Cpu)?;
@@ -28,7 +28,12 @@ fn main() -> Result<()> {
         let loss = ys.sub(&sample_ys)?.sqr()?.sum_all()?;
         opt.backward_step(&loss)?;
         scheduler.step(&mut opt)?;
-        println!("{} {} {}", scheduler.step_t, loss.to_vec0::<f32>()?, scheduler.get_lr()?);
+        println!(
+            "{} {} {}",
+            scheduler.step_t,
+            loss.to_vec0::<f32>()?,
+            scheduler.get_lr()?
+        );
     }
 
     Ok(())

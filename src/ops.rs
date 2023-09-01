@@ -1,4 +1,4 @@
-use candle_core::{Tensor, Result};
+use candle_core::{Result, Tensor};
 
 pub(crate) fn clamp(x: &Tensor, min: f64, max: f64) -> Result<Tensor> {
     let device = x.device();
