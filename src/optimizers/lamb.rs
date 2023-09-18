@@ -1,7 +1,7 @@
 use super::*;
 
 /*
-Citation:
+Citation(s):
 @misc{you2020large,
       title={Large Batch Optimization for Deep Learning: Training BERT in 76 minutes},
       author={Yang You and Jing Li and Sashank Reddi and Jonathan Hseu and Sanjiv Kumar and Srinadh Bhojanapalli and Xiaodan Song and James Demmel and Kurt Keutzer and Cho-Jui Hsieh},
@@ -13,7 +13,7 @@ Citation:
 */
 
 #[derive(Clone, Debug)]
-pub struct ParamsLamb {
+pub struct ConfigLamb {
     pub lr: f64,
     pub beta1: f64,
     pub beta2: f64,
@@ -21,7 +21,7 @@ pub struct ParamsLamb {
     pub weight_decay: f64,
 }
 
-impl Default for ParamsLamb {
+impl Default for ConfigLamb {
     fn default() -> Self {
         Self {
             lr: 0.001,
@@ -44,11 +44,13 @@ struct VarLamb {
 pub struct Lamb {
     vars: Vec<VarLamb>,
     step_t: usize,
-    params: ParamsLamb,
+    params: ConfigLamb,
 }
 
-impl Lamb {
-    pub fn new(vars: Vec<Var>, params: ParamsLamb) -> Result<Self> {
+impl Optimizer for Lamb {
+    type Config = ConfigLamb;
+
+    fn new(vars: Vec<Var>, config: Self::Config) -> candle_core::Result<Self> {
         let vars = vars
             .into_iter()
             .map(|var| {
@@ -60,24 +62,16 @@ impl Lamb {
                     second_moment,
                 })
             })
-            .collect::<Result<Vec<_>>>()?;
+            .collect::<Result<Vec<_>, Error>>()?;
 
         Ok(Self {
             vars,
-            params,
             step_t: 0,
+            params: config,
         })
     }
 
-    pub fn new_lr(vars: Vec<Var>, lr: f64) -> Result<Self> {
-        let params = ParamsLamb {
-            lr,
-            ..Default::default()
-        };
-        Self::new(vars, params)
-    }
-
-    fn step(&mut self, grads: &GradStore) -> Result<()> {
+    fn step(&mut self, grads: &GradStore) -> candle_core::Result<()> {
         self.step_t += 1;
 
         let lr = self.params.lr;
@@ -118,18 +112,12 @@ impl Lamb {
         }
         Ok(())
     }
-}
 
-impl Optimizer for Lamb {
-    fn backward_step(&mut self, loss: &Tensor) -> Result<()> {
-        self.step(&loss.backward()?)
-    }
-
-    fn get_lr(&self) -> f64 {
+    fn learning_rate(&self) -> f64 {
         self.params.lr
     }
 
-    fn set_lr(&mut self, lr: f64) {
+    fn set_learning_rate(&mut self, lr: f64) {
         self.params.lr = lr;
     }
 }

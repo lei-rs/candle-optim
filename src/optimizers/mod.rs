@@ -1,18 +1,13 @@
 use candle_core::backprop::GradStore;
 use candle_core::{Module, Tensor, Var};
-use color_eyre::Result;
+use candle_nn::optim::Optimizer;
+use candle_core::Error;
 
-pub use adamw::{AdamW, ParamsAdamW};
-pub use lamb::{Lamb, ParamsLamb};
+pub use adamw::{AdamW, ConfigAdamW};
+pub use lamb::{ConfigLamb, Lamb};
 
 use crate::ops::*;
 
 mod adamw;
 mod lamb;
 mod sophia;
-
-pub trait Optimizer {
-    fn backward_step(&mut self, loss: &Tensor) -> Result<()>;
-    fn get_lr(&self) -> f64;
-    fn set_lr(&mut self, lr: f64);
-}

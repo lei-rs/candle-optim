@@ -1,6 +1,6 @@
 use candle_core::{DType, Device, Module, Tensor};
 use candle_nn::{linear, Linear, VarBuilder, VarMap};
-use candle_optim::optimizers::{Lamb, Optimizer, ParamsLamb};
+use candle_optim::optimizers::{ConfigLamb, Lamb, Optimizer};
 use candle_optim::schedulers::{ConstantWithWarmup, Scheduler};
 use color_eyre::Result;
 
@@ -18,7 +18,7 @@ fn main() -> Result<()> {
     let varmap = VarMap::new();
     let vb = VarBuilder::from_varmap(&varmap, DType::F32, &Device::Cpu);
     let model = linear(2, 1, vb.pp("linear"))?;
-    let params = ParamsLamb::default();
+    let params = ConfigLamb::default();
     let schedule = ConstantWithWarmup::try_new(100, params.lr)?;
     let mut scheduler = Scheduler::new(&schedule);
     let mut opt = Lamb::new(varmap.all_vars(), params)?;
